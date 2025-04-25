@@ -16,10 +16,14 @@ public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String title;
 
     @Builder
-    public PostEntity(String name) {
-        this.name = name;
+    public PostEntity(String title) {
+        this.title = title;
+    }
+
+    public void update(String title) {
+        this.title = title;
     }
 }
