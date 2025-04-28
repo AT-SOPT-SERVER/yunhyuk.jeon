@@ -28,6 +28,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'jakarta.validation:jakarta.validation-api'
 	implementation 'org.hibernate.validator:hibernate-validator'
+	implementation 'mysql:mysql-connector-java:8.0.32'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
