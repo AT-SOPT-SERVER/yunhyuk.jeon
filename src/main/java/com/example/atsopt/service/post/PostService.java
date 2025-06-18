@@ -13,6 +13,10 @@ import com.example.atsopt.persistence.repository.user.UserRepository;
 import com.example.atsopt.persistence.repository.post.CommentRepository;
 import com.example.atsopt.persistence.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,12 +61,23 @@ public class PostService {
         return PostDetailResponseDTO.from(postEntity, commentListResponseDTO);
     }
 
-    public PostListResponseDTO getAllPosts() {
-        List<PostEntity> postEntityList = postRepository.findAll();
-        List<PostResponseDTO> postResponseDTOList = postEntityList.stream()
+//    public PostListResponseDTO getAllPosts() {
+//        List<PostEntity> postEntityList = postRepository.findAll();
+//        List<PostResponseDTO> postResponseDTOList = postEntityList.stream()
+//                .map(PostResponseDTO::from)
+//                .toList();
+//        return PostListResponseDTO.of(postResponseDTOList);
+//    }
+
+    public PostPageResponseDTO getAllPosts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<PostEntity> postPage = postRepository.findAllByOrderByIdDesc(pageable);
+
+        List<PostResponseDTO> postDTOs = postPage.getContent().stream()
                 .map(PostResponseDTO::from)
                 .toList();
-        return PostListResponseDTO.of(postResponseDTOList);
+
+        return PostPageResponseDTO.of(postDTOs, postPage.getTotalPages()-1, page);
     }
 
     public void deletePost(Long id) {

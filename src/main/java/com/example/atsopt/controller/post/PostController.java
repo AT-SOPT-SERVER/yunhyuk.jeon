@@ -5,6 +5,7 @@ import com.example.atsopt.dto.post.in.PostCreateDTO;
 import com.example.atsopt.dto.post.in.PostUpdateDTO;
 import com.example.atsopt.dto.post.out.PostListResponseDTO;
 import com.example.atsopt.dto.post.out.PostDetailResponseDTO;
+import com.example.atsopt.dto.post.out.PostPageResponseDTO;
 import com.example.atsopt.dto.post.out.PostSearchResponse;
 import com.example.atsopt.persistence.entity.post.PostTag;
 import com.example.atsopt.service.post.PostService;
@@ -27,10 +28,18 @@ public class PostController {
         postService.createPost(userId, postCreateDTO);
     }
 
+//    @GetMapping
+//    public ResponseEntity<PostListResponseDTO> getAllPosts() {
+//        PostListResponseDTO postListResponseDTO = postService.getAllPosts();
+//        return ResponseEntity.ok(postListResponseDTO);
+//    }
+
     @GetMapping
-    public ResponseEntity<PostListResponseDTO> getAllPosts() {
-        PostListResponseDTO postListResponseDTO = postService.getAllPosts();
-        return ResponseEntity.ok(postListResponseDTO);
+    public ResponseEntity<PostPageResponseDTO> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PostPageResponseDTO response = postService.getAllPosts(page, size);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
