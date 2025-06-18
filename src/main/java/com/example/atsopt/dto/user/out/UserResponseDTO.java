@@ -1,6 +1,6 @@
 package com.example.atsopt.dto.user.out;
 
-import com.example.atsopt.repository.user.UserEntity;
+import com.example.atsopt.persistence.entity.user.UserEntity;
 
 public record UserResponseDTO(Long id, String name) {
     public static UserResponseDTO from(UserEntity userEntity) {

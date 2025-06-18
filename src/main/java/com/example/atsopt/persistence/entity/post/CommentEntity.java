@@ -1,6 +1,6 @@
-package com.example.atsopt.repository.post;
+package com.example.atsopt.persistence.entity.post;
 
-import com.example.atsopt.repository.user.UserEntity;
+import com.example.atsopt.persistence.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,10 +25,20 @@ public class CommentEntity {
     @ManyToOne
     UserEntity user;
 
+    long likeCount;
+
     @Builder
-    public CommentEntity(String content, PostEntity post, UserEntity user) {
+    public CommentEntity(String content, PostEntity post, UserEntity user, long likeCount) {
         this.content = content;
         this.post = post;
         this.user = user;
+        this.likeCount = 0L;
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+    public void decrementLikeCount() {
+        this.likeCount--;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.atsopt.repository.post;
+package com.example.atsopt.persistence.entity.post;
 
 public enum PostTag {
     BACKEND,

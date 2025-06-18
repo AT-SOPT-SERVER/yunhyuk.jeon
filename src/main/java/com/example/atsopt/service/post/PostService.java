@@ -5,14 +5,21 @@ import com.example.atsopt.dto.post.in.PostCommentCreateDTO;
 import com.example.atsopt.dto.post.in.PostCreateDTO;
 import com.example.atsopt.dto.post.in.PostUpdateDTO;
 import com.example.atsopt.dto.post.out.*;
-import com.example.atsopt.repository.post.*;
-import com.example.atsopt.repository.user.UserEntity;
-import com.example.atsopt.repository.user.UserRepository;
+import com.example.atsopt.persistence.entity.post.*;
+import com.example.atsopt.persistence.entity.user.UserEntity;
+import com.example.atsopt.persistence.repository.post.CommentLikeRepository;
+import com.example.atsopt.persistence.repository.post.PostLikeRepository;
+import com.example.atsopt.persistence.repository.user.UserRepository;
+import com.example.atsopt.persistence.repository.post.CommentRepository;
+import com.example.atsopt.persistence.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +30,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     public void createPost(Long userId, PostCreateDTO postCreateDTO) {
         UserEntity userEntity = userRepository.findById(userId)
@@ -52,12 +61,23 @@ public class PostService {
         return PostDetailResponseDTO.from(postEntity, commentListResponseDTO);
     }
 
-    public PostListResponseDTO getAllPosts() {
-        List<PostEntity> postEntityList = postRepository.findAll();
-        List<PostResponseDTO> postResponseDTOList = postEntityList.stream()
+//    public PostListResponseDTO getAllPosts() {
+//        List<PostEntity> postEntityList = postRepository.findAll();
+//        List<PostResponseDTO> postResponseDTOList = postEntityList.stream()
+//                .map(PostResponseDTO::from)
+//                .toList();
+//        return PostListResponseDTO.of(postResponseDTOList);
+//    }
+
+    public PostPageResponseDTO getAllPosts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<PostEntity> postPage = postRepository.findAllByOrderByIdDesc(pageable);
+
+        List<PostResponseDTO> postDTOs = postPage.getContent().stream()
                 .map(PostResponseDTO::from)
                 .toList();
-        return PostListResponseDTO.of(postResponseDTOList);
+
+        return PostPageResponseDTO.of(postDTOs, postPage.getTotalPages()-1, page);
     }
 
     public void deletePost(Long id) {
@@ -113,5 +133,79 @@ public class PostService {
                 .build();
 
         commentRepository.save(commentEntity);
+    }
+
+    public void likePost(Long userId, Long postId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다."));
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException("게시물을 찾을 수 없습니다."));
+
+        if (postLikeRepository.existsByUserAndPost(user, post)) {
+            throw new BusinessException("이미 좋아요를 눌렀습니다.");
+        }
+
+        postLikeRepository.save(PostLikeEntity.builder().user(user).post(post).build());
+        post.incrementLikeCount(); // post.likeCount++
+    }
+
+    public void unlikePost(Long userId, Long postId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다."));
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException("게시물을 찾을 수 없습니다."));
+
+        if (!postLikeRepository.existsByUserAndPost(user, post)) {
+            throw new BusinessException("좋아요를 누르지 않았습니다.");
+        }
+
+        postLikeRepository.deleteByUserAndPost(user, post);
+        post.decrementLikeCount(); // post.likeCount--
+    }
+
+    public List<UserEntity> getPostLikers(Long postId) {
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException("게시물을 찾을 수 없습니다."));
+        return postLikeRepository.findByPost(post)
+                .stream()
+                .map(PostLikeEntity::getUser)
+                .toList();
+    }
+
+    public void likeComment(Long userId, Long commentId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다."));
+        CommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException("댓글을 찾을 수 없습니다."));
+
+        if (commentLikeRepository.existsByUserAndComment(user, comment)) {
+            throw new BusinessException("이미 좋아요를 눌렀습니다.");
+        }
+
+        commentLikeRepository.save(CommentLikeEntity.builder().user(user).comment(comment).build());
+        comment.incrementLikeCount();
+    }
+
+    public void unlikeComment(Long userId, Long commentId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("사용자를 찾을 수 없습니다."));
+        CommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException("댓글을 찾을 수 없습니다."));
+
+        if (!commentLikeRepository.existsByUserAndComment(user, comment)) {
+            throw new BusinessException("좋아요를 누르지 않았습니다.");
+        }
+
+        commentLikeRepository.deleteByUserAndComment(user, comment);
+        comment.decrementLikeCount();
+    }
+
+    public List<UserEntity> getCommentLikers(Long commentId) {
+        CommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException("댓글을 찾을 수 없습니다."));
+        return commentLikeRepository.findByComment(comment)
+                .stream()
+                .map(CommentLikeEntity::getUser)
+                .toList();
     }
 }
