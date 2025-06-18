@@ -1,6 +1,8 @@
-package com.example.atsopt.repository.post;
+package com.example.atsopt.persistence.repository.post;
 
-import com.example.atsopt.repository.user.UserEntity;
+import com.example.atsopt.persistence.entity.post.PostEntity;
+import com.example.atsopt.persistence.entity.post.PostTag;
+import com.example.atsopt.persistence.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

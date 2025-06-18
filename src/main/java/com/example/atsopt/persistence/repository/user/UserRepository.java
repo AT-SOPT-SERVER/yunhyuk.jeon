@@ -1,9 +1,8 @@
-package com.example.atsopt.repository.user;
+package com.example.atsopt.persistence.repository.user;
 
+import com.example.atsopt.persistence.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {

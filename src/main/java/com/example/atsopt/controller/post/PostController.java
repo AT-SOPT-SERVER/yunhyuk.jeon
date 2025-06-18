@@ -6,7 +6,7 @@ import com.example.atsopt.dto.post.in.PostUpdateDTO;
 import com.example.atsopt.dto.post.out.PostListResponseDTO;
 import com.example.atsopt.dto.post.out.PostDetailResponseDTO;
 import com.example.atsopt.dto.post.out.PostSearchResponse;
-import com.example.atsopt.repository.post.PostTag;
+import com.example.atsopt.persistence.entity.post.PostTag;
 import com.example.atsopt.service.post.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -66,5 +66,39 @@ public class PostController {
                               @PathVariable Long id,
                               @RequestBody @Valid PostCommentCreateDTO postCommentCreateDTO) {
         postService.createComment(userId, id, postCommentCreateDTO);
+    }
+
+    // ===== 게시글 좋아요 =====
+
+    @PostMapping("/{id}/like")
+    public void likePost(@RequestHeader Long userId, @PathVariable Long id) {
+        postService.likePost(userId, id);
+    }
+
+    @DeleteMapping("/{id}/like")
+    public void unlikePost(@RequestHeader Long userId, @PathVariable Long id) {
+        postService.unlikePost(userId, id);
+    }
+
+    @GetMapping("/{id}/like")
+    public ResponseEntity<?> getPostLikers(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPostLikers(id));
+    }
+
+    // ===== 댓글 좋아요 =====
+
+    @PostMapping("/comment/{id}/like")
+    public void likeComment(@RequestHeader Long userId, @PathVariable Long id) {
+        postService.likeComment(userId, id);
+    }
+
+    @DeleteMapping("/comment/{id}/like")
+    public void unlikeComment(@RequestHeader Long userId, @PathVariable Long id) {
+        postService.unlikeComment(userId, id);
+    }
+
+    @GetMapping("/comment/{id}/like")
+    public ResponseEntity<?> getCommentLikers(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getCommentLikers(id));
     }
 }

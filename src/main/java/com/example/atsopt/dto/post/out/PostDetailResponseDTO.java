@@ -1,15 +1,16 @@
 package com.example.atsopt.dto.post.out;
 
 import com.example.atsopt.dto.user.out.UserResponseDTO;
-import com.example.atsopt.repository.post.PostEntity;
-import com.example.atsopt.repository.post.PostTag;
+import com.example.atsopt.persistence.entity.post.PostEntity;
+import com.example.atsopt.persistence.entity.post.PostTag;
 
 public record PostDetailResponseDTO(Long id,
                                     String title,
                                     String content,
                                     UserResponseDTO userResponseDTO,
                                     PostTag postTag,
-                                    CommentListResponseDTO commentListResponseDTO) {
+                                    CommentListResponseDTO commentListResponseDTO,
+                                    long likeCount) {
     public static PostDetailResponseDTO from(PostEntity postEntity, CommentListResponseDTO commentListResponseDTO) {
         return new PostDetailResponseDTO(
                 postEntity.getId(),
@@ -17,7 +18,8 @@ public record PostDetailResponseDTO(Long id,
                 postEntity.getContent(),
                 UserResponseDTO.from(postEntity.getUser()),
                 postEntity.getPostTag(),
-                commentListResponseDTO
+                commentListResponseDTO,
+                postEntity.getLikeCount()
         );
     }
 }

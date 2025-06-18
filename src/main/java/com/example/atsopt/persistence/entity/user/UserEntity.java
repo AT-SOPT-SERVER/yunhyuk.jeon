@@ -1,4 +1,4 @@
-package com.example.atsopt.repository.user;
+package com.example.atsopt.persistence.entity.user;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

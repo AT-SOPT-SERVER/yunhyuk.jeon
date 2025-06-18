@@ -1,9 +1,8 @@
 package com.example.atsopt.service.user;
 
 import com.example.atsopt.dto.user.in.UserCreateDTO;
-import com.example.atsopt.dto.user.out.UserResponseDTO;
-import com.example.atsopt.repository.user.UserEntity;
-import com.example.atsopt.repository.user.UserRepository;
+import com.example.atsopt.persistence.entity.user.UserEntity;
+import com.example.atsopt.persistence.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
